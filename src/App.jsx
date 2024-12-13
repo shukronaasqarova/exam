@@ -1,6 +1,6 @@
 import React from 'react'
 import Home from './pages/Home'
-import Products from './pages/Products'
+import CoinDetails from './pages/CoinDetails'
 import { Routes, Route,} from 'react-router-dom'
 import './App.css'
 
@@ -10,7 +10,7 @@ function App() {
     <div>
         <Routes>
           <Route path="/" element={<Home />}></Route>
-          <Route path="/products" element={<Products />}></Route>
+          <Route path="/coin/:id" element={<CoinDetails />} />
         </Routes>
     </div>
   )
