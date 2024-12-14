@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Slider from 'react-slick';
 import Header from '../components/Header';
 import bgImage from '../assets/background.jpg';
@@ -6,37 +7,38 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaSearch, FaEye } from 'react-icons/fa';
 import ReactPaginate from 'react-paginate';
-import { useNavigate } from 'react-router-dom'; 
 
 function Home() {
     const [coins, setCoins] = useState([]);
     const [search, setSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [selectedCurrency, setSelectedCurrency] = useState('usd'); 
     const coinsPerPage = 10;
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     useEffect(() => {
-        fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=USD&order=gecko_desc&per_page=${coinsPerPage}&page=${currentPage}&sparkline=false&price_change_percentage=24h`)
+        fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=${selectedCurrency}&order=market_cap_desc&per_page=${coinsPerPage}&page=${currentPage}`)
             .then(response => response.json())
             .then(data => {
                 setCoins(data);
-                const totalCount = 1000; 
-                setTotalPages(Math.ceil(totalCount / coinsPerPage));
+                setTotalPages(Math.ceil(100 / coinsPerPage)); 
             })
-            .catch(error => console.log(error));
-    }, [currentPage]);
+            .catch(error => {
+                console.log(error);
+            });
+    }, [selectedCurrency, currentPage]);
 
     const filteredCoins = coins.filter(coin =>
         coin.name.toLowerCase().includes(search.toLowerCase())
     );
 
-    const handlePageClick = ({ selected }) => {
+    const handleNext = ({ selected }) => {
         setCurrentPage(selected + 1);
     };
 
     const handleNavigate = (coinId) => {
-        navigate(`/coin/${coinId}`); 
+        navigate(`/coin/${coinId}`);
     };
 
     const settings = {
@@ -65,9 +67,7 @@ function Home() {
 
     return (
         <div>
-            <div>
-                <Header />
-            </div>
+            <Header selectedCurrency={selectedCurrency} setSelectedCurrency={setSelectedCurrency} />
             <div className='mt-3'>
                 <div
                     style={{
@@ -137,7 +137,6 @@ function Home() {
                             </thead>
                             <tbody>
                                 {filteredCoins.length > 0 && filteredCoins.map((coin, index) => (
-                                   
                                     <tr
                                         key={coin.id}
                                         className="border-b border-gray-700"
@@ -167,7 +166,7 @@ function Home() {
                             pageCount={totalPages}
                             marginPagesDisplayed={1}
                             pageRangeDisplayed={3}
-                            onPageChange={handlePageClick}
+                            onPageChange={handleNext}
                             containerClassName="flex items-center space-x-2"
                             pageClassName="px-3 py-2 rounded-full text-[#87CEEB] cursor-pointer hover:bg-gray-800"
                             activeClassName="bg-gray-800 text-[#87CEEB] font-bold"

@@ -1,21 +1,25 @@
-import React from 'react'
+import React from 'react';
 
-function Header() {
+const Header = ({ selectedCurrency, setSelectedCurrency }) => {
   return (
-    <div className='flex justify-around items-center mt-5'>
-        <div>
-            <h2 className='text-2xl font-bold text-[#87CEEB]'>CRYPTOFOLIO</h2>
-        </div>
-        <div className='flex gap-5'>
-            <select className='bg-transparent text-white' name="" id="">
-                <option value="">USD</option>
-                <option value="">UZB</option>
-                <option value="">EURO</option>
-            </select>
-            <button className='bg-[#87CEEB] py-2 px-5 font-medium rounded-md'>WATCH LIST</button>
-        </div>
-    </div>
-  )
-}
+    <header className="flex justify-around items-center text-white py-4">
+      <div>
+        <h2 className='text-2xl font-bold text-[#87CEEB]'>CRYPTOFOLIO</h2>
+      </div>
+      <div className="flex justify-center gap-5">
+        <button className='bg-[#87CEEB] py-2 px-5 font-medium rounded-md'>WATCH LIST</button>
+        <select
+          value={selectedCurrency}
+          onChange={(e) => setSelectedCurrency(e.target.value)}
+          className="bg-gray-700 p-2 text-white rounded"
+        >
+          <option value="usd">USD</option>
+          <option value="eur">EUR</option>
+          <option value="chf">CHF</option>
+        </select>
+      </div>
+    </header>
+  );
+};
 
-export default Header
+export default Header;

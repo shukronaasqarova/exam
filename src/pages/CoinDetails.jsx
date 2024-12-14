@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
+import CoinChart from '../components/CoinChart';
 
 function CoinDetails() {
   const { id } = useParams();
@@ -23,49 +24,37 @@ function CoinDetails() {
       <div className="flex p-10">
         <div className="w-[300px] pr-10">
           <img
-            src={coin.image.large || 'https://via.placeholder.com/150'}
+            src={coin.image.large}
             alt={coin.name}
             className="w-[120px] h-[120px] mb-5"
           />
           <h1 className="text-white text-3xl mb-8">{coin.name}</h1>
           <p className="text-[#999] text-sm mb-3">
-            Bitcoin is the first successful internet money based on peer-to-peer technology, whereby no central bank or authority is involved in the transaction and production of the Bitcoin currency.
+            {coin.description.en.split('. ')[0]}...
           </p>
           <div className="mt-8">
             <div className="flex items-center mb-4">
               <span className="text-[#999] mr-3">Rank:</span>
-              <span className="text-white">1</span>
+              <span className="text-white">{coin.market_cap_rank}</span>
             </div>
             <div className="flex items-center mb-4">
               <span className="text-[#999] mr-3">Current Price:</span>
-              <span className="text-white">${coin.market_data.current_price.usd}</span>
+              <span className="text-white">${coin.market_data.current_price.usd.toFixed(2)}</span>
             </div>
             <div className="flex items-center mb-4">
               <span className="text-[#999] mr-3">Market Cap:</span>
               <span className="text-white">${coin.market_data.market_cap.usd.toLocaleString()}</span>
             </div>
+            <div className="flex items-center mb-4">
+              <span className="text-[#999] mr-3">24h Change:</span>
+              <span className={`text-${coin.market_data.price_change_percentage_24h > 0 ? 'green' : 'red'}-400`}>
+                {coin.market_data.price_change_percentage_24h.toFixed(2)}%
+              </span>
+            </div>
           </div>
         </div>
         <div className="flex-1">
-
-          {/* chart alohida component qilib yasalishi kerek! */}
-          <div className="bg-[#242424] p-5 rounded-lg h-[400px]">
-            
-          </div>
-          <div className="flex gap-3 mt-5">
-            <button className="bg-[#5fb2ff] text-black border-none px-4 py-2 rounded cursor-pointer">
-              24 Hours
-            </button>
-            <button className="bg-transparent text-white border border-[#333] px-4 py-2 rounded cursor-pointer">
-              30 Days
-            </button>
-            <button className="bg-transparent text-white border border-[#333] px-4 py-2 rounded cursor-pointer">
-              3 Months
-            </button>
-            <button className="bg-transparent text-white border border-[#333] px-4 py-2 rounded cursor-pointer">
-              1 Year
-            </button>
-          </div>
+          <CoinChart coinId={id} />
         </div>
       </div>
     </div>
