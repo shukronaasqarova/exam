@@ -2,86 +2,74 @@ import React, { useState, useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts';
 
 function CoinChart({ coinId }) {
-  const [chartData, setChartData] = useState([]);
+  const [data, setData] = useState([]);
   const [timeframe, setTimeframe] = useState('24h');
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(function() {
-    setIsLoading(true);
+  const timeOptions = [
+    { label: '24 Hours', value: '24h', days: 1 },
+    { label: '30 Days', value: '30d', days: 30 },
+    { label: '3 Months', value: '3m', days: 90 },
+    { label: '1 Year', value: '1y', days: 365 },
+  ];
 
-    let days = 1;
-    if (timeframe === '30d') days = 30;
-    if (timeframe === '3m') days = 90;
-    if (timeframe === '1y') days = 365;
-
-    fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`)
-      .then(function(response) {
-        return response.json();
-      })
-      .then(function(data) {
-        setChartData(data.prices);
-        setIsLoading(false);
-      })
-      .catch(function(error) {
-        console.error("Ma'lumotlarni yuklashda xatolik:", error);
-        setIsLoading(false);
+  useEffect(() => {
+    setLoading(true);
+    const selectedTime = timeOptions.find((option) => option.value === timeframe);
+    fetch(
+      `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${selectedTime.days}`
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        setData(res.prices.map((p) => ({ x: p[0], y: p[1] })));
+        setLoading(false);
       });
   }, [coinId, timeframe]);
 
-  const options = {
-    chart: {
-      type: 'line',
-      height: 350,
+  const chartOptions = {
+    chart: { 
+      type: 'line', 
       background: 'transparent',
-      toolbar: { show: false }
-    },
-    theme: { mode: 'dark' },
-    stroke: { curve: 'smooth', width: 2 },
-    xaxis: {
-      type: 'datetime',
-      labels: { style: { colors: '#999' } }
-    },
-    yaxis: {
-      labels: {
-        style: { colors: '#999' },
-        formatter: function(value) { return '$' + value.toFixed(2); }
+      toolbar: {
+        show: false
+      },
+      zoom: {
+        enabled: false
       }
     },
-    tooltip: {
-      theme: 'dark',
-      x: { format: 'dd MMM yyyy HH:mm' },
-      y: { formatter: function(value) { return '$' + value.toFixed(2); } }
-    },
-    grid: { borderColor: '#333' }
+    stroke: { curve: 'smooth' },
+    xaxis: { type: 'datetime' },
+    yaxis: { labels: { formatter: (v) => `$${v.toFixed(2)}` } },
+    grid: { borderColor: '#333' },
   };
 
-  const series = [{
-    name: 'Narx',
-    data: chartData.map(function(item) {
-      return { x: new Date(item[0]), y: item[1] };
-    })
-  }];
-
   return (
-    <div className="w-full">
-      <div className="mb-4 flex gap-4">
-        {['24h', '30d', '3m', '1y'].map(function(tf) {
-          return (
-            <button
-              key={tf}
-              onClick={function() { setTimeframe(tf); }}
-              className={'px-4 py-2 rounded ' + (timeframe === tf ? 'bg-blue-500' : 'bg-gray-700')}
-            >
-              {tf === '24h' ? '24 Soat' : tf === '30d' ? '30 Kun' : tf === '3m' ? '3 Oy' : '1 Yil'}
-            </button>
-          );
-        })}
-      </div>
-      {isLoading ? (
-        <div className="text-white text-center">Yuklanmoqda...</div>
+    <div className="text-center">
+      {loading ? (
+        <p>Loading...</p>
       ) : (
-        <ReactApexChart options={options} series={series} type="line" height={350} />
+        <ReactApexChart
+          options={chartOptions}
+          series={[{ name: 'Price', data }]}
+          type="line"
+          height={350}
+        />
       )}
+      <div className="mb-4 flex gap-4 justify-center">
+        {timeOptions.length > 0 && timeOptions.map((option) => (
+          <button
+            key={option.value}
+            onClick={() => setTimeframe(option.value)}
+            className={`px-4 py-2 rounded ${
+              timeframe === option.value
+                ? 'bg-[#87CEEB] text-black w-[285px] shadow-md'
+                : 'bg-transparent border-[#87CEEB] text-white w-[285px]'
+            }`}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

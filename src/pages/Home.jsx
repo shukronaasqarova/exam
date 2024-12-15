@@ -13,7 +13,7 @@ function Home() {
     const [search, setSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
-    const [selectedCurrency, setSelectedCurrency] = useState('usd'); 
+    const [selectedCurrency, setSelectedCurrency] = useState('usd');
     const coinsPerPage = 10;
     const navigate = useNavigate();
 
@@ -22,7 +22,7 @@ function Home() {
             .then(response => response.json())
             .then(data => {
                 setCoins(data);
-                setTotalPages(Math.ceil(100 / coinsPerPage)); 
+                setTotalPages(Math.ceil(100 / coinsPerPage));
             })
             .catch(error => {
                 console.log(error);
@@ -147,9 +147,13 @@ function Home() {
                                             <span>{coin.name}</span>
                                         </td>
                                         <td className="py-4 px-4 text-lg">$ {coin.current_price.toFixed(2)}</td>
-                                        <td className={`py-4 px-4 ${coin.price_change_percentage_24h > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                            <FaEye />
-                                            {coin.price_change_percentage_24h.toFixed(2)}%
+                                        <td className={`flex items-center gap-2 py-4 px-4 ${coin.price_change_percentage_24h > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                            <p>
+                                                <FaEye />
+                                            </p>
+                                            <p>
+                                                {coin.price_change_percentage_24h.toFixed(2)}%
+                                            </p>
                                         </td>
                                         <td className="py-4 px-4 text-lg">$ {coin.market_cap.toLocaleString()}</td>
                                     </tr>
